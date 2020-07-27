@@ -195,7 +195,17 @@ export default class Example extends Component {
   render() {
     return (
       <Surface width={this.props.screenWidth} height={this.props.screenHeight}>
-        <HelloBlue currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
+        {(() => {
+          console.log(this.state.currentVisualization);
+          switch (this.props.whichSketch) {
+            case 0:
+              return <HelloBlue currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
+            case 1:
+              return <MagentaSurprise currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
+            case 2:
+              return <GreenStrobe currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
+            }
+        })()}
         {/* <GreenStrobe currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
         <MagentaSurprise currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/> */}
        </Surface> 
