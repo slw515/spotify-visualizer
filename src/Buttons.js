@@ -1,13 +1,16 @@
 import React, { Component } from 'react'
 import MagentaSunrise from "./images/button-magenta-surprise.png";
 import RedFlash from "./images/button-red-flash.png";
+import DancingBlob from "./images/button-dancing-blob.png";
 
 class Buttons extends Component {
 
   render() {
     const names = [
-        ['Red Flash', 0, RedFlash], 
+        ['Dancing Blob', 0, DancingBlob], 
         ['Magenta Sunrise', 1, MagentaSunrise], 
+        ['Red Flash', 2, RedFlash], 
+
         // ['Artwork Warp', 2], 
         // ['Booming Boxes',3]
     ];

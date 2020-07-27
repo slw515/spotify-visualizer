@@ -103,7 +103,81 @@ const shaders = Shaders.create({
 
       gl_FragColor = image;
     }
-  ` }
+  ` },
+  purpleWaves: {
+    frag: GLSL`
+    precision highp float;
+    float redPerc = 0.;
+    float greenPerc = 0.9;
+    float bluePerc = 1.;
+    uniform float currentLoudness;
+    uniform float currentTime;
+    varying vec2 uv;
+
+    uniform sampler2D image;
+
+    void main(){
+      vec2 coord = uv.xy * 8.;
+
+      for(int n = 1; n < 4; n+=2) {
+        float i = float(n);
+        // coord += vec2(currentLoudness * 0.5 + sin(currentTime) * 5./ i *sin(i * currentTime + coord.y) + 0.8, 10. /i * sin(coord.x + currentTime + 0.3 * i) + 1.0);
+        coord += vec2((currentLoudness / 7.0) / i *sin(i * currentTime + coord.y) + 0.8, 10. /i * sin(coord.x + currentTime + 0.3 * i) + 1.0);
+
+    }
+       
+    vec3 color = vec3(0.7 * sin(coord.x) * 0.6 + redPerc, 0.1 * + greenPerc, sin(coord.x * coord.y) + bluePerc);
+  
+    gl_FragColor = vec4(color, 1.0);
+    }
+  `
+  },
+  dancingBlob: {
+    frag: GLSL`
+    precision highp float;
+    float redPerc = 0.3;
+    float greenPerc = 0.2;
+    float bluePerc = 1.;
+    uniform float currentLoudness;
+    uniform float currentTime;
+    varying vec2 uv;
+    #define PI 3.14159265359
+
+    float rand(float n){return fract(sin(n) * 43758.5453123);}
+    float rand(vec2 n) { 
+      return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
+    }
+    
+    float noise(vec2 p, float freq ){
+      float unit = uv.x/freq;
+      vec2 ij = floor(p/unit);
+      vec2 xy = mod(p,unit)/unit;
+      xy = .5*(1.-cos(PI*xy));
+      float a = rand((ij+vec2(0.,0.)));
+      float b = rand((ij+vec2(1.,0.)));
+      float c = rand((ij+vec2(0.,1.)));
+      float d = rand((ij+vec2(1.,1.)));
+      float x1 = mix(a, b, xy.x);
+      float x2 = mix(c, d, xy.x);
+      return mix(x1, x2, xy.y);
+    }
+    
+    float circleShape(vec2 position, float radius) {
+      return step(radius, length(position - vec2(noise(position, sin(currentTime / 16.) * 15. / 1.9)) * 0.04));
+    }
+    
+    void main() {
+        vec2 coord = uv.xy * 1.;
+        float color;
+        coord.x *= 1.9;
+        vec2 translate = vec2(-.95, -0.5);
+        coord += translate;
+    
+        float circle = circleShape(coord, (abs(sin(currentTime / 3.) / 9.) + 0.26) + abs(currentLoudness) / 80.);
+        gl_FragColor = vec4(0.9, circle -0.2, 0.8, 1.);
+    }
+  `
+  }
 });
 
 
@@ -121,11 +195,25 @@ export class MagentaSurprise extends Component {
     return <Node shader={shaders.magentaSurprise} uniforms={{ currentLoudness, currentTime }} />;
   }
 }
+export class DancingBlob extends Component {
+  render() {
+    const { currentLoudness, currentTime } = this.props;
+    return <Node shader={shaders.dancingBlob} uniforms={{ currentLoudness, currentTime }} />;
+  }
+}
+
 
 export class GreenStrobe extends Component {
   render() {
     const { currentLoudness, currentTime } = this.props;
     return <Node shader={shaders.greenStrobe} uniforms={{ currentLoudness, currentTime}} />;
+  }
+}
+
+export class PurpleWaves extends Component {
+  render() {
+    const { currentLoudness, currentTime } = this.props;
+    return <Node shader={shaders.purpleWaves} uniforms={{ currentLoudness, currentTime}} />;
   }
 }
 
@@ -199,11 +287,15 @@ export default class Example extends Component {
           console.log(this.state.currentVisualization);
           switch (this.props.whichSketch) {
             case 0:
-              return <HelloBlue currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
+              return <DancingBlob currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
             case 1:
-              return <MagentaSurprise currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
+              // return <MagentaSurprise currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
+              return <PurpleWaves currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
+              // return <HelloBlue currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
             case 2:
-              return <GreenStrobe currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
+              // return <GreenStrobe currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
+              return <HelloBlue currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
+
             }
         })()}
         {/* <GreenStrobe currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
