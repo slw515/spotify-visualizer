@@ -10,9 +10,9 @@ class Buttons extends Component {
         ['Dancing Blob', 0, DancingBlob], 
         ['Magenta Sunrise', 1, MagentaSunrise], 
         ['Red Flash', 2, RedFlash], 
+        ['Artwork Warp', 3, this.props.albumArtwork], 
+        ['Bouncing Skull', 4, this.props.albumArtwork], 
 
-        // ['Artwork Warp', 2], 
-        // ['Booming Boxes',3]
     ];
     const { changeButtonRender  } = this.props;
 

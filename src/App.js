@@ -112,11 +112,14 @@ class App extends Component {
                 return <GLShaderSample currentLoudness = {this.state.currentStats.currentLoudness} screenWidth={this.state.width} screenHeight={this.state.height} albumArtwork={this.state.nowPlaying.image} whichSketch={this.state.currentVisualization}></GLShaderSample> 
               case 2:
                 return <GLShaderSample currentLoudness = {this.state.currentStats.currentLoudness} screenWidth={this.state.width} screenHeight={this.state.height} albumArtwork={this.state.nowPlaying.image} whichSketch={this.state.currentVisualization}></GLShaderSample>
-                case 2:
-              return <GLShaderSample currentLoudness = {this.state.currentStats.currentLoudness} screenWidth={this.state.width} screenHeight={this.state.height} albumArtwork={this.state.nowPlaying.image} whichSketch={this.state.currentVisualization}></GLShaderSample>
+              case 3:
+                return <GLShaderSample currentLoudness = {this.state.currentStats.currentLoudness} screenWidth={this.state.width} screenHeight={this.state.height} albumArtwork={this.state.nowPlaying.image} whichSketch={this.state.currentVisualization}></GLShaderSample>
+              case 4:
+                return <ThreeScene cubesNumber = {20} screenWidth={this.state.width} screenHeight={this.state.height} currentLoudness = {this.state.currentStats.currentLoudness}></ThreeScene>
+
               }
           })()}
-          <Buttons changeButtonRender={this.changeRenderButtons}></Buttons>
+          <Buttons changeButtonRender={this.changeRenderButtons} albumArtwork={this.state.nowPlaying.image}></Buttons>
           <div id="musicPlayerContainer">
             <div id="musicInfo">
               <div>
@@ -137,7 +140,7 @@ class App extends Component {
               <div id="greenSquare">
                 <img src={SpotifyLogo} id="spotify-logo"/>
               </div>
-              <h1>Please Login With Spotify To Access The Visualizer!</h1>
+              <h1>Please Login With Spotify And Play A Song To Access The Visualizer!</h1>
                 <button>
                   <a href="http://localhost:8888">
                     Login With Spotify

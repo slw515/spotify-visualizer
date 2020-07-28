@@ -83,7 +83,7 @@ const shaders = Shaders.create({
   imageManipulate: {
     // uniforms are variables from JS. We pipe blue uniform into blue output color
     frag: GLSL`
-    precision highp float;
+    precision mediump float;
     float redPerc = 0.9;
     float greenPerc =0.3;
     float bluePerc = 0.9;
@@ -93,15 +93,41 @@ const shaders = Shaders.create({
 
     uniform sampler2D image;
 
-    void main(){
-      vec2 coord = uv.xy;
-      vec3 color = vec3(0.0);
-      vec4 image = texture2D(image, coord);
-      
-      image.r += sin(coord.x * 90.0);
-      image.g += sin(coord.y * 90.0);
+     float radius = 1.0;
+     float angle = 2.0;
+     vec2 center = vec2(.15, 0.1);
 
-      gl_FragColor = image;
+    vec2 distortMap(float distance) {
+      float percent = (radius - distance) / radius;
+      float theta = pow(percent, 3.0) * angle * 8.0;
+      float sinAng = sin(theta);
+      float cosAng = cos(theta);
+      return vec2(sinAng / 10.0, cosAng / 10.0);
+    }
+
+    vec4 imageWarpEffect(sampler2D image, vec2 uvPos, float distortValue) {
+      vec2  textureSize  = vec2(uvPos.x, uvPos.y);
+      vec2 tc = uvPos * textureSize;
+      tc -= center;
+      float dist = length(tc);
+      if (dist < radius) 
+      {
+        tc = distortMap(dist);
+      }
+      tc += center;
+      vec3 color = texture2D(image, tc / textureSize).rgb;
+      return vec4(color, 1.0);
+
+    }
+
+
+    void main(){
+      radius =abs(sin(currentTime))+ 4.0;
+      angle =abs(sin(currentTime)) + sin(currentTime) / 5.0 + currentLoudness / 1.4;
+      vec2 coord = uv.xy;
+      // vec3 color = vec3(0.0);
+
+      gl_FragColor = imageWarpEffect(image, coord, 2.0);
     }
   ` },
   purpleWaves: {
@@ -180,8 +206,6 @@ const shaders = Shaders.create({
   }
 });
 
-
-
 // We can make a <HelloBlue blue={0.5} /> that will render the concrete <Node/>
 export class HelloBlue extends Component {
   render() {
@@ -201,7 +225,6 @@ export class DancingBlob extends Component {
     return <Node shader={shaders.dancingBlob} uniforms={{ currentLoudness, currentTime }} />;
   }
 }
-
 
 export class GreenStrobe extends Component {
   render() {
@@ -255,15 +278,11 @@ export default class Example extends Component {
       if (this.moderate > 0) {
         this.cubeScale = this.lerp(this.cubeScale, this.currentCubeScale, 0.03);
       }
-      // if (this.props.currentLoudness - this.prevLoudness == 0 || this.props.currentLoudness - this.prevLoudness < 0 ) {
       else{
         this.cubeScale = this.lerp(this.cubeScale, 0, 0.007);
-        // this.cubeScale = this.curr entCubeScale-=0.1;
       }
       this.moderate-=0.06;
-      // if (this.prevLoudness != this.props.currentLoudness) {
       this.prevLoudness = this.props.currentLoudness;
-      // }
       this.prevCubeScale = this.currentCubeScale;
       this.setState({
           currentTime: this.state.currentTime + 0.005
@@ -295,7 +314,10 @@ export default class Example extends Component {
             case 2:
               // return <GreenStrobe currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
               return <HelloBlue currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
-
+            case 3:
+              return <ImageManipulate currentTime={this.state.currentTime} currentLoudness={this.cubeScale}>
+                {this.props.albumArtwork}
+              </ImageManipulate>
             }
         })()}
         {/* <GreenStrobe currentTime={this.state.currentTime} currentLoudness={this.cubeScale}/>
